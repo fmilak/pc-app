@@ -50,7 +50,7 @@ public class TecajService {
         List<Tecaj> tecajList = tecajRepository.getTecajByDate(date);
         if (tecajList == null || tecajList.isEmpty()) {
             tecajList = parseTecaj(getTecajFromApi(date));
-//            tecajList.forEach(tecaj -> tecajRepository.insertTecaj(tecaj)); fixme fix DB
+//            tecajList.forEach(tecaj -> tecajRepository.insertTecaj(tecaj)); fixme
         }
 
         return tecajList;
