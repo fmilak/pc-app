@@ -17,6 +17,9 @@ public class FlexibleBigDecimalDeserializer extends NumberDeserializers.BigDecim
             decimalString = decimalString.replace(",", ".");
         }
 
+        if (decimalString.isEmpty()) {
+            decimalString = "1";
+        }
         return new BigDecimal(decimalString);
     }
 }

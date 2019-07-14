@@ -2,9 +2,6 @@ package com.milak.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.milak.model.Tecaj;
 import com.milak.repository.TecajRepository;
 import org.apache.http.HttpEntity;
@@ -51,7 +48,7 @@ public class TecajService {
         return tecajList;
     }
 
-    public String getTecajFromApi(LocalDate date) {
+    private String getTecajFromApi(LocalDate date) {
         String url = "http://api.hnb.hr/tecajn/v2?datum-primjene=" + date.toString();
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
@@ -80,6 +77,30 @@ public class TecajService {
         }
 
         return tecajList;
+    }
+
+    public JSONArray fillJson(List<Tecaj> tecajList) {
+        JSONArray jsonArray = new JSONArray();
+        tecajList.forEach(tecaj -> {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("value", tecaj.getValuta());
+                jsonObject.put("label", tecaj.getValuta());
+            } catch (JSONException e) {
+                LOGGER.error(e);
+            }
+            jsonArray.put(jsonObject);
+        });
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("value", "HRK");
+            jsonObject.put("label", "HRK");
+        } catch (JSONException e) {
+            LOGGER.error(e);
+        }
+        jsonArray.put(jsonObject);
+        return jsonArray;
     }
 
 }
