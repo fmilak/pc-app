@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.milak.repository.TecajRepository">
+    <resultMap id="tecajResultMap" type="com.milak.model.Tecaj">
+        <result column="brojTecajnice" property="broj_tecajnice" />
+        <result column="datumPrimjene" property="datum_primjene" />
+        <result column="drzava" property="drzava" />
+        <result column="sifraValute" property="sifra_valute" />
+        <result column="valuta" property="valuta" />
+        <result column="jedinica" property="jedinica" />
+        <result column="kupovni" property="kupovni" />
+        <result column="srednji" property="srednji" />
+        <result column="prodajni" property="prodajni" />
+    </resultMap>
+
+    <insert id="insertTecaj" parameterMap="com.milak.model.Tecaj">
+        insert into tecaj (
+            broj_tecajnice,
+            datum_primjene,
+            drzava,
+            sifra_valute,
+            valuta,
+            jedinica,
+            kupovni,
+            srednji,
+            prodajni
+        ) values (
+            ${brojTecajnice},
+            ${datumPrimjene},
+            ${drzava},
+            ${sifraValute},
+            ${valuta},
+            ${jedinica},
+            ${kupovni},
+            ${srednji},
+            ${prodajni}
+        )
+    </insert>
+
+</mapper>
