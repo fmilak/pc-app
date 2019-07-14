@@ -5,8 +5,6 @@ import com.milak.service.TecajService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +20,20 @@ public class ConversionController {
     @Autowired
     private TecajService tecajService;
 
+    /**
+     * Endpoint for converting currencies.
+     * @param conversionDate - date for conversion
+     * @param firstCurr - currency(valuta) from which we convert
+     * @param secondCurr - currency(valuta) to which we convert
+     * @param value - value which is converted
+     * @return - conversion result as {@link String}
+     */
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(value = "convert", consumes = "application/json")
     public String convert(@RequestHeader("conversionDate") String conversionDate,
                           @RequestHeader("firstCurr") String firstCurr,
                           @RequestHeader("secondCurr") String secondCurr,
-                          @RequestHeader("value") String value) {
+                          @RequestHeader(value = "value", required = false) String value) {
 
         LocalDate date = LocalDate.parse(conversionDate);
         List<Tecaj> tecajList = tecajService.getTecajByDate(date);
@@ -46,26 +52,30 @@ public class ConversionController {
         if (StringUtils.isNotEmpty(value)) {
             intValue = Integer.parseInt(value);
         }
-        BigDecimal firstValue = new BigDecimal(1);
-        BigDecimal secondValue = new BigDecimal(1);
+        BigDecimal firstValue;
+        BigDecimal secondValue;
         if (fromCurr == null && toCurr == null) {
             return String.valueOf(intValue);
         }
         if (fromCurr == null) {
-            secondValue = new BigDecimal(intValue).divide(toCurr.getKupovni(), 5, RoundingMode.HALF_UP);
+            secondValue = new BigDecimal(intValue).divide(toCurr.getKupovni(), 5, RoundingMode.UP).multiply(BigDecimal.valueOf(toCurr.getJedinica()));
             return String.valueOf(secondValue);
         }
         if (toCurr == null) {
-            firstValue = new BigDecimal(intValue).multiply(fromCurr.getKupovni());
+            firstValue = new BigDecimal(intValue).multiply(fromCurr.getKupovni()).setScale(5, RoundingMode.UP).multiply(BigDecimal.valueOf(fromCurr.getJedinica()));
             return String.valueOf(firstValue);
         }
 
-        firstValue = new BigDecimal(intValue).multiply(fromCurr.getKupovni());
-        secondValue = firstValue.divide(toCurr.getKupovni(), 5, RoundingMode.HALF_UP);
+        firstValue = new BigDecimal(intValue).multiply(fromCurr.getKupovni().setScale(5, RoundingMode.UP)).multiply(BigDecimal.valueOf(fromCurr.getJedinica()));
+        secondValue = firstValue.divide(toCurr.getKupovni(), 5, RoundingMode.UP).multiply(BigDecimal.valueOf(toCurr.getJedinica()));
 
         return String.valueOf(secondValue);
     }
 
+    /**
+     * Returns formated currencies to front.
+     * @return {@link JSONArray} as {@link String}
+     */
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "currencies")
     public String getCurrencies() {

@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Service for working with tecaj.
+ * @author filip
+ */
 @Service
 public class TecajService {
     private static final Logger LOGGER = Logger.getLogger(TecajService.class);
@@ -30,24 +33,34 @@ public class TecajService {
     @Autowired
     private TecajRepository tecajRepository;
 
-    public Tecaj getTecaj() {
-        return null;
-    }
-
+    /**
+     * Inserts new {@link Tecaj} into DB.
+     * @param tecaj {@link Tecaj}
+     */
     public void insertTecaj(Tecaj tecaj) {
         tecajRepository.insertTecaj(tecaj);
     }
 
+    /**
+     * Returns tecaj list by date.
+     * @param date - date for getting tecaj {@link LocalDate}
+     * @return {@link List} of {@link Tecaj}
+     */
     public List<Tecaj> getTecajByDate(LocalDate date) {
         List<Tecaj> tecajList = tecajRepository.getTecajByDate(date);
         if (tecajList == null || tecajList.isEmpty()) {
             tecajList = parseTecaj(getTecajFromApi(date));
-//            tecajList.forEach(tecaj -> tecajRepository.insertTecaj(tecaj)); todo
+//            tecajList.forEach(tecaj -> tecajRepository.insertTecaj(tecaj)); fixme fix DB
         }
 
         return tecajList;
     }
 
+    /**
+     * Private method for getting tecaj from HNB.API by date.
+     * @param date - date for getting tecaj {@link LocalDate}
+     * @return - tecaj list as json {@link String}
+     */
     private String getTecajFromApi(LocalDate date) {
         String url = "http://api.hnb.hr/tecajn/v2?datum-primjene=" + date.toString();
         CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -66,6 +79,11 @@ public class TecajService {
         return tecajJson;
     }
 
+    /**
+     * Helper method for parsing tecaj json.
+     * @param jsonTecaji - {@link String} with tecaj
+     * @return {@link List} of {@link Tecaj}
+     */
     private List<Tecaj> parseTecaj(String jsonTecaji) {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -79,6 +97,11 @@ public class TecajService {
         return tecajList;
     }
 
+    /**
+     * Fills json array for showing on front.
+     * @param tecajList - {@link List} of {@link Tecaj}
+     * @return - {@link JSONArray} formated for front
+     */
     public JSONArray fillJson(List<Tecaj> tecajList) {
         JSONArray jsonArray = new JSONArray();
         tecajList.forEach(tecaj -> {
